@@ -1,0 +1,112 @@
+#!/usr/bin/python3 
+
+import argparse
+import datetime
+import sys
+import re
+from collections import namedtuple
+import matplotlib.pyplot as plt
+import termplotlib as tpl
+
+"""A wrapper script for matplotlib for plot graphs from the cmdline
+
+Plan:
+[x] Take a variable stream of data without header.
+[x] Take a variable stream with header
+    [x] parse option from commandline
+    [x] use header parameters to lable graph
+[x] Plot either directly to the commandline or to graphs
+    [x] parse option from commandline to determine which
+[] Deal with datetimes!
+[x] Autodump to /tmp
+[] different delimiters 
+
+"""
+
+testdata = [(1, 2),(2, 3),(3, 4)]
+
+def select_delimiter(delim):
+
+    if delim == 't':
+        d = '\t'
+    elif delim == 's':
+        d = '\s'
+    else:
+        d = ','
+    return d
+
+
+def generate_headers(header, d):
+
+    if header:
+        for row in sys.stdin:
+            headers = list(parse_input(row, d))
+            break
+    else:
+        headers = ['x', 'y1']
+    return headers
+
+
+def parse_input(row, delim, data=False):
+    splitrow = row.split(delim)
+    x = [letter for letter in splitrow[-1].split()]
+    splitrow[-1] = "".join(x)
+    if data:
+        splitrow = [int(v) for v in splitrow]
+    else:
+        splitrow = [v.strip() for v in splitrow]
+    return splitrow
+
+
+def process_stream(data):
+    return [*zip(*data)]
+
+
+def plot_data(data, headers, show=False):
+
+    mfig = plt.figure()
+    tfig = tpl.figure()
+
+    x = data[0]
+    for i, col in enumerate(data):
+        print('i', i, 'col', col)
+        if i == 0:
+            continue
+        else:
+            try:
+                label=headers[i]
+            except IndexError:
+                label="y{}".format(i)
+            plt.plot(x, col, label=label)
+            tfig.plot(x, col, label=label)
+
+
+    plt.legend()
+    plt.savefig('/tmp/{}-{}.jpeg'.format("".join(headers), datetime.datetime.now().isoformat(timespec='minutes')), format='jpeg')
+    if show:
+        plt.show()
+    else:
+        tfig.show()
+
+
+def process(delim, header=False):
+
+    d = select_delimiter(args.delim)
+    header = args.header
+    headers = generate_headers(header, d)
+
+    parsedinput = [parse_input(row, d, data=True) for row in sys.stdin]
+    dataforplotting = process_stream(parsedinput)
+    print(dataforplotting)
+    plot_data(dataforplotting, headers)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--header", help="specify if there is a header or not in the stream", action="store_true")
+    parser.add_argument("--show", help="display the matplotlib figure immediately", action="store_true")
+    parser.add_argument("--delimiter", help="specify the delimiter used to split the file.\
+                        Typical delimiter are commas (c), tabs (t), spaces (s)", dest='delim', default='c')
+    args = parser.parse_args()
+    sys.exit(process(args))
+
