@@ -1,6 +1,7 @@
-#!/usr/bin/python3 
+#!/usr/bin/env python3 
 
 import argparse
+import csv
 import datetime
 import sys
 import re
@@ -19,11 +20,9 @@ Plan:
     [x] parse option from commandline to determine which
 [] Deal with datetimes!
 [x] Autodump to /tmp
-[] different delimiters 
+[x] different delimiters 
 
 """
-
-testdata = [(1, 2),(2, 3),(3, 4)]
 
 def select_delimiter(delim):
 
@@ -36,10 +35,10 @@ def select_delimiter(delim):
     return d
 
 
-def generate_headers(header, d):
+def generate_headers(header, d, stream):
 
     if header:
-        for row in sys.stdin:
+        for row in stream:
             headers = list(parse_input(row, d))
             break
     else:
@@ -69,7 +68,6 @@ def plot_data(data, headers, show=False):
 
     x = data[0]
     for i, col in enumerate(data):
-        print('i', i, 'col', col)
         if i == 0:
             continue
         else:
@@ -89,13 +87,21 @@ def plot_data(data, headers, show=False):
         tfig.show()
 
 
-def process(delim, header=False):
+def process(delim, filename, header=False):
 
     d = select_delimiter(args.delim)
     header = args.header
-    headers = generate_headers(header, d)
+    filename = args.filename
 
-    parsedinput = [parse_input(row, d, data=True) for row in sys.stdin]
+    if filename:
+        with open(filename, 'w') as f:
+            stream = csv.reader(f)
+    else:
+        stream = sys.stdin
+
+    headers = generate_headers(header, d, stream)
+
+    parsedinput = [parse_input(row, d, data=True) for row in stream]
     dataforplotting = process_stream(parsedinput)
     print(dataforplotting)
     plot_data(dataforplotting, headers)
@@ -107,6 +113,7 @@ if __name__ == '__main__':
     parser.add_argument("--show", help="display the matplotlib figure immediately", action="store_true")
     parser.add_argument("--delimiter", help="specify the delimiter used to split the file.\
                         Typical delimiter are commas (c), tabs (t), spaces (s)", dest='delim', default='c')
+    parser.add_argument("--filename", help="give a filename to load", dest='filename', default=None)
     args = parser.parse_args()
     sys.exit(process(args))
 
