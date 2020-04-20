@@ -21,6 +21,7 @@ Plan:
 [] Deal with datetimes!
 [x] Autodump to /tmp
 [x] different delimiters 
+[] read from files as well as stdin
 
 """
 
