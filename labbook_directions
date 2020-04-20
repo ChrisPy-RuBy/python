@@ -3,6 +3,13 @@
 import pyperclip
 import sys
 
+"""Tiny tool for searching my labbook.
+
+Requirements: pyperclip
+
+
+"""
+
 labbook_address = 'http://127.0.0.1:8000/{}'
 for line in sys.stdin:
     splitline = line.split('.md')
