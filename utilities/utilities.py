@@ -2,6 +2,9 @@ import pprint as pp
 from collections import defaultdict
 from functools import wraps
 from inspect import getcallargs
+import time
+import math
+from functools import partial, wraps
 
 
 def dump_args_and_return(func):
@@ -14,9 +17,6 @@ def dump_args_and_return(func):
         return results
 
     return wrapper
-
-
-from functools import partial, wraps
 
 
 def print_result(func=None, *, prefix=""):
@@ -65,10 +65,6 @@ def transpose_table(data):
                 row[c] = 0
         results.append(row)
     return results
-
-
-import time
-import math
 
 
 def retry(func, exception):
@@ -138,3 +134,34 @@ def retry_dec_with_exception(exception):
         return wrapper
 
     return inner_function
+
+
+def file_batch_generator(filelist, batch_size=10):
+    """Take a iterable and yield a list in size batches of batch size
+    """
+    if not filelist:
+        return filelist
+
+    if batch_size <= 0:
+        return filelist
+
+    batch = 0
+    size = len(filelist)
+    start_idx = 0
+    end_idx = batch_size
+    while True:
+
+        if start_idx >= size:
+            break
+
+        filebatch = filelist[start_idx:end_idx]
+        batch += 1
+        start_idx += batch_size
+
+        if end_idx >= size:
+            end_idx = size - 1
+        else:
+            end_idx += batch_size
+        yield batch, filebatch
+
+>>>>>>> 676900a... batch process util
