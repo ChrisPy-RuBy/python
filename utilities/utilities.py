@@ -34,6 +34,17 @@ def print_result(func=None, *, prefix=""):
     return wrapper
 
 
+def hash_dedupe(data)
+    results = {}
+    for k, v in data:
+        if k in results:
+            if hash(v) > hash(results[k]):
+                results[k] = v
+        else:
+            results[k] = v
+        return list((k, v) for k, v in results.items())
+
+
 def transpose_table(data):
 
     """Turn data like this
