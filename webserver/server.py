@@ -4,26 +4,22 @@ What do am I trying to do?
 - parse the request and mirror it into the output
 
 """
-
-
-
-
 import socketserver
 from http.server import BaseHTTPRequestHandler
 
-another_response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\nConnection: close\r\n\r\nHello, world!"
+# I stole this response from somewhere.
+another_response = "HTTP/1.1 200 OK\r\n\nHello, world!"
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """
+    Taken from the python docs
+
     The request handler class for our server.
 
     It is instantiated once per connection to the server, and must
     override the handle() method to implement communication to the
     client.
     """
-    counter = 0
-
-
     def handle(self):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
@@ -31,13 +27,12 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         print(self.data)
         # just send back the same data, but upper-cased
         # self.request.sendall(self.data.upper())
-        bin_counter = " {}".format(self.counter)
-        self.request.sendall("".join([another_response, bin_counter]).encode())
-        self.counter += 1
+        self.request.sendall((another_response).encode())
 
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8888
+    print(f"Listening on {HOST}:{PORT}")
 
     # Create the server, binding to localhost on port 9999
     with socketserver.TCPServer((HOST, PORT), MyTCPHandler) as server:

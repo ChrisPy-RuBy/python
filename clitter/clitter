@@ -7,7 +7,6 @@ import sys
 import re
 from collections import namedtuple
 import matplotlib.pyplot as plt
-import termplotlib as tpl
 
 """A wrapper script for matplotlib for plot graphs from the cmdline
 
@@ -65,8 +64,6 @@ def process_stream(data):
 def plot_data(data, headers, show=False):
 
     mfig = plt.figure()
-    tfig = tpl.figure()
-
     x = data[0]
     for i, col in enumerate(data):
         if i == 0:
@@ -77,18 +74,14 @@ def plot_data(data, headers, show=False):
             except IndexError:
                 label="y{}".format(i)
             plt.plot(x, col, label=label)
-            tfig.plot(x, col, label=label)
-
 
     plt.legend()
-    plt.savefig('/tmp/{}-{}.jpeg'.format("".join(headers), datetime.datetime.now().isoformat(timespec='minutes')), format='jpeg')
-    if show:
-        plt.show()
-    else:
-        tfig.show()
+    plt.savefig('/tmp/{headers}-{timestamp}.jpeg'.format(headers="".join(headers), 
+                                                         timestamp=datetime.datetime.now().isoformat(timespec='minutes')))
+    plt.show()
 
 
-def process(delim, filename, header=False):
+def process(args):
 
     d = select_delimiter(args.delim)
     header = args.header
@@ -101,10 +94,9 @@ def process(delim, filename, header=False):
         stream = sys.stdin
 
     headers = generate_headers(header, d, stream)
-
+    
     parsedinput = [parse_input(row, d, data=True) for row in stream]
     dataforplotting = process_stream(parsedinput)
-    print(dataforplotting)
     plot_data(dataforplotting, headers)
 
 
@@ -112,9 +104,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--header", help="specify if there is a header or not in the stream", action="store_true")
     parser.add_argument("--show", help="display the matplotlib figure immediately", action="store_true")
-    parser.add_argument("--delimiter", help="specify the delimiter used to split the file.\
+    parser.add_argument("--delim", help="specify the delimiter used to split the file.\
                         Typical delimiter are commas (c), tabs (t), spaces (s)", dest='delim', default='c')
-    parser.add_argument("--filename", help="give a filename to load", dest='filename', default=None)
+    parser.add_argument("--filename", help="give a filename to load", dest='filename', default="")
     args = parser.parse_args()
     sys.exit(process(args))
 

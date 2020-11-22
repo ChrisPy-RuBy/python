@@ -1,10 +1,12 @@
+import math
+import numpy as np
 import pprint as pp
+import time
+import matplotlib.pyplot as plt
 from collections import defaultdict
+from functools import partial, wraps
 from functools import wraps
 from inspect import getcallargs
-import time
-import math
-from functools import partial, wraps
 
 
 def dump_args_and_return(func):
@@ -34,7 +36,7 @@ def print_result(func=None, *, prefix=""):
     return wrapper
 
 
-def hash_dedupe(data)
+def hash_dedupe(data):
     results = {}
     for k, v in data:
         if k in results:
@@ -141,9 +143,7 @@ def retry_dec_with_exception(exception):
                     attempt += 1
                 except Exception:
                     raise "Something else happened"
-
         return wrapper
-
     return inner_function
 
 
@@ -175,4 +175,18 @@ def file_batch_generator(filelist, batch_size=10):
             end_idx += batch_size
         yield batch, filebatch
 
->>>>>>> 676900a... batch process util
+############
+# Datascience functions
+############
+
+
+def plot_function(*f):
+    """Plot whatever functions you pass in.
+    """
+   
+    fig, ax = plt.subplots()
+    x_data = np.linspace(-5, 5, 100)
+    for function in f:
+        y = [function(x) for x in x_data]
+        ax.plot(x_data, y)
+    plt.show()
