@@ -4,11 +4,13 @@ What do am I trying to do?
 - parse the request and mirror it into the output
 
 """
+
 import socketserver
 from http.server import BaseHTTPRequestHandler
 
 # I stole this response from somewhere.
 another_response = "HTTP/1.1 200 OK\r\n\nHello, world!"
+
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """
@@ -38,5 +40,5 @@ if __name__ == "__main__":
     with socketserver.TCPServer((HOST, PORT), MyTCPHandler) as server:
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
+        print(f"serving on {HOST}:{PORT}")
         server.serve_forever()
-C
