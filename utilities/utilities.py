@@ -44,7 +44,7 @@ def hash_dedupe(data):
                 results[k] = v
         else:
             results[k] = v
-        return list((k, v) for k, v in results.items())
+    return list((k, v) for k, v in results.items())
 
 
 def transpose_table(data):
