@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import requests
 
 
-def my_image_getter(search_term):
-    subscription_key = "5c1dac441ae542cbbb435e3a7a44c083"
+def my_image_getter(search_term, key):
+    subscription_key = key
     search_url = "https://api.bing.microsoft.com/v7.0/images/search"
     headers = {"Ocp-Apim-Subscription-Key": subscription_key}
     print(f"searching  for {search_term}")
