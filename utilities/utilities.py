@@ -1,3 +1,5 @@
+import csv
+import datetime
 import math
 import numpy as np
 import pprint as pp
@@ -5,7 +7,6 @@ import time
 import matplotlib.pyplot as plt
 from collections import defaultdict
 from functools import partial, wraps
-from functools import wraps
 from inspect import getcallargs
 
 
@@ -19,6 +20,24 @@ def dump_args_and_return(func):
         return results
 
     return wrapper
+
+
+def time_it_csv_dump(path):
+    """Write processing times to a csv
+    """
+    def actual_decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            start = datetime.datetime.now().timestamp()
+            results = f(*args, **kwargs)
+            finish = datetime.datetime.now().timestamp()
+            with open(path, 'a+') as file:
+                writer = csv.writer(file)
+                writer.writerow([start, finish, finish - start])
+                print(f"{start}: {finish}")
+            return results
+        return wrapper
+    return actual_decorator
 
 
 def print_result(func=None, *, prefix=""):
